@@ -113,5 +113,27 @@ public async Task<IActionResult> Assign(int driverId, int vehicleId)
 
     return Ok(assignment);
 }
+
+        [HttpPost("{id}/complete")]
+        public async Task<IActionResult> Complete(int id)
+        {
+            var assignment = _context.Assignments.Find(id);
+            if (assignment == null) return NotFound("Assignment not found");
+            if (assignment.EndTime != null) return BadRequest("Assignment already completed");
+
+            var driver = _context.Drivers.Find(assignment.DriverId);
+            var vehicle = _context.Vehicles.Find(assignment.VehicleId);
+
+            if (driver != null) driver.Status = "Available";
+            if (vehicle != null) vehicle.Status = "Active";
+            
+            assignment.EndTime = DateTime.Now;
+            assignment.Status = "Completed";
+
+            _context.SaveChanges();
+            await _hub.Clients.All.SendAsync("RefreshStats");
+
+            return Ok(assignment);
+        }
     }
 }

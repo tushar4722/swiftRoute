@@ -28,13 +28,18 @@ namespace SwiftRoute.API.Controllers
 
         // ✅ EXISTING POST UPGRADED
         [HttpPost]
-        public async Task<IActionResult> Create(Vehicle v)
+        public async Task<IActionResult> Create(VehicleDTO vDto)
         {
-            if (string.IsNullOrEmpty(v.RequiredClass)) v.RequiredClass = "Class A";
-            if (string.IsNullOrEmpty(v.Status)) v.Status = "Active";
-            
-            // New vehicle sets its baseline maintenance at current od
-            v.LastServiceOdometer = v.CurrentOdometer;
+            var v = new Vehicle
+            {
+                Model = vDto.Model,
+                RequiredClass = string.IsNullOrEmpty(vDto.RequiredClass) ? "Class A" : vDto.RequiredClass,
+                PlateNumber = vDto.PlateNumber,
+                Year = vDto.Year,
+                CurrentOdometer = vDto.CurrentOdometer,
+                Status = "Active",
+                LastServiceOdometer = vDto.CurrentOdometer
+            };
 
             _context.Vehicles.Add(v);
             _context.SaveChanges();

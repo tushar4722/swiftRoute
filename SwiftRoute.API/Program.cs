@@ -31,6 +31,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+// 🚨 Global Error Handling Middleware to prevent sensitive data exposure
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"error\": \"An unexpected error occurred. Please try again later.\"}");
+    });
+});
+
 // 🔹 Swagger
 if (app.Environment.IsDevelopment())
 {

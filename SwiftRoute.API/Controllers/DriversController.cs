@@ -29,9 +29,16 @@ namespace SwiftRoute.API.Controllers
 
         // ✅ POST create driver
         [HttpPost]
-        public async Task<IActionResult> Create(Driver driver)
+        public async Task<IActionResult> Create(DriverDTO driverDto)
         {
-            if (string.IsNullOrEmpty(driver.Status)) driver.Status = "Available";
+            var driver = new Driver 
+            {
+                Name = driverDto.Name,
+                LicenseNumber = driverDto.LicenseNumber,
+                LicenseClass = driverDto.LicenseClass,
+                ExpiryDate = driverDto.ExpiryDate,
+                Status = "Available"
+            };
 
             _context.Drivers.Add(driver);
             _context.SaveChanges();
@@ -42,15 +49,15 @@ namespace SwiftRoute.API.Controllers
 
         // ✅ UPDATE driver (ADD THIS)
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Driver driver)
+        public IActionResult Update(int id, DriverDTO driverDto)
         {
             var existing = _context.Drivers.Find(id);
             if (existing == null) return NotFound();
 
-            existing.Name = driver.Name;
-            existing.LicenseClass = driver.LicenseClass;
-            existing.ExpiryDate = driver.ExpiryDate;
-            existing.Status = driver.Status;
+            existing.Name = driverDto.Name;
+            existing.LicenseNumber = driverDto.LicenseNumber;
+            existing.LicenseClass = driverDto.LicenseClass;
+            existing.ExpiryDate = driverDto.ExpiryDate;
 
             _context.SaveChanges();
 
